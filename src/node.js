@@ -8,6 +8,7 @@ class Node {
 	}
 
 	appendChild(node) {
+		if(node){
 			if(!this.left){
 				this.left = node;
 				node.parent = this;
@@ -16,6 +17,7 @@ class Node {
 				this.right = node;
 				node.parent = this;
 			}
+		}
 	}
 
 	removeChild(node) {
@@ -33,60 +35,56 @@ class Node {
 	}
 
 	remove() {
-		if(this.parent){
-			this.parent.removeChild(this)	
-		}
+		if(this.parent)
+			this.parent.removeChild(this)
 	}
 
 	swapWithParent() {
 		if(this.parent){
-			let node = this,
+	        let	node = this,
 				parent = this.parent,
-				leftChild = this.left,
-				rightChild = this.right,
-				parentOfParent = this.parent.parent,
-				leftChildOfParent = this.parent.left,
-				rightChildOfParent = this.parent.right;
+	        	leftChild = this.left,
+	        	rightChild = this.right,
+	        	parentOfParent = this.parent.parent,
+	    		leftChildOfParent = this.parent.left,
+	    		rightChildOfParent = this.parent.right;
 
-			//обновляем с потомков node и с родителя node на потомков
-			if(leftChild){
-				leftChild.parent = parent;
-				parent.left = leftChild;
-			}
-			if(rightChild){
-				rightChild.parent = parent;
-				parent.right = rightChild;
-			}
+	    	node.remove();
+	    	parent.remove();
+			node.left = null;
+			node.right = null;
 
-			//...и, если необходимо, соседнюю ветку
-			if(leftChildOfParent == node){
-				node.left = parent;
-				parent.parent = node;
-				if(rightChildOfParent){
-					rightChildOfParent.parent = node
-					node.right = rightChildOfParent;
-				}
-			}
-			else if(rightChildOfParent == node){
-				node.right = parent;
-				parent.parent = node;
-				if(leftChildOfParent){
-					leftChildOfParent.parent = node
-					node.left = leftChildOfParent;
-				}
-			}
+	    	//обновляем соседнюю ветку
+	        if(rightChildOfParent && leftChildOfParent == node){
+	        	rightChildOfParent.parent = node;
+	    		node.right = rightChildOfParent;
+	        }
+	        else if(leftChildOfParent && rightChildOfParent == node){
+	        	leftChildOfParent.parent = node;
+	    		node.left = leftChildOfParent;
+	        }
+	        
+	        //обновляем с потомков node и с родителя node на потомков
+	        node.appendChild(parent);
+	    	if(leftChild){
+	            leftChild.parent = parent;
+	            parent.left = leftChild;
+	        }
+	        else{
+	            parent.left = null;
+	        }
+	        if(rightChild){
+	        	rightChild.parent = parent;
+	            parent.right = rightChild;
+	        }
+	        else{
+	            parent.right = null;
+	        }
 
-			//обновляем с родителя родителя node
-			if(parentOfParent){
-				this.parent = parentOfParent;
-				this.parent.parent = this;
-				if(parentOfParent.left == parent){
-					parentOfParent.left = node
-				}
-				else if(parentOfParent.right == parent){
-					parentOfParent.right = node
-				}
-			}
+	        //обновляем с родителя родителя node
+	    	if(parentOfParent){
+	            parentOfParent.appendChild(node);
+	    	}
 		}
 	}
 }

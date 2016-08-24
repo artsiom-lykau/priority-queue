@@ -4,42 +4,60 @@ class MaxHeap {
 	constructor() {
 		this.root = null;
 		this.parentNodes = [];
-		this.size = 0;
+		this.currentSize = 0;
 	}
 
 	push(data, priority) {
 		let node = new Node(data, priority);
 		this.insertNode(node);
 		this.shiftNodeUp(node);
-		this.size++;
+		this.currentSize++;
 	}
 
 	pop() {
-
+		if(!this.isEmpty()){
+			let root = this.detachRoot();
+			this.restoreRootFromLastInsertedNode(root);
+			this.shiftNodeDown(this.root);
+			this.currentSize--;
+			return root.data;
+		}
 	}
 
 	detachRoot() {
-		let root = this.root;
-		this.root = null;
-		return root
+		if(this.root){
+			let root = this.root;
+			this.root = null;
+			if (this.parentNodes[0] == root)
+				this.parentNodes.shift();
+			return root;
+		}
 	}
 
 	restoreRootFromLastInsertedNode(detached) {
-		
+		let node = this.parentNodes.pop();
+		if(node){
+			this.root = node;
+			this.parentNodes.unshift(node);
+			if(detached.left)
+				node.appendChild(detached.left);
+			if(detached.right)
+				node.appendChild(detached.right);
+		}
 	}
 
 	size() {
-		
+		return this.currentSize
 	}
 
 	isEmpty() {
-		return (!this.root && !this.parentNodes.length)
+		return (!this.root)
 	}
 
 	clear() {
 		this.root = null;
 		this.parentNodes = [];
-		this.size = 0;
+		this.currentSize = 0;
 	}
 
 	insertNode(node) {
@@ -51,33 +69,52 @@ class MaxHeap {
 	}
 
 	shiftNodeUp(node) {
-		if(node.parent){
-			this.parentNodes.forEach(function(item, i, arr){
-				if(item == node.parent){
-					arr[i] = node;
-				}
-				else if(item == node){
-					arr[i] = node.parent;
-				}
-			})
-			if(node.priority > node.parent.priority){
-				node.swapWithParent();
-				this.shiftNodeUp(node);
-			}
-			else{
+		if(node.parent && node.priority > node.parent.priority){
+			if(node.parent == this.root)
 				this.root = node;
-			}
+			this.parentNodes.forEach(function(item, i, arr){
+				if(item == node.parent)
+					arr[i] = node;
+				else if(item == node)
+					arr[i] = node.parent;
+			})
+			node.swapWithParent();
+			this.shiftNodeUp(node);
 		}
-
 	}
 
 	shiftNodeDown(node) {
-		if(node){
-			if(node.left.priority > node.right.priority){
-
+		if(node && (node.left || node.right)){
+			let child;
+			if(!node.right || node.left.priority > node.right.priority){
+				child = node.left;
+				if(child.priority > node.priority){
+					if(this.root == node)
+						this.root = child
+					this.parentNodes.forEach(function(item, i, arr){
+						if(item == node)
+							arr[i] = child;
+						if(item == child)
+							arr[i] = node;
+					})
+					child.swapWithParent();
+					this.shiftNodeDown(node);
+				}
 			}
-			else if(node.left.priority < node.right.priority){
-				
+			else if(!node.left || node.left.priority < node.right.priority){
+				child = node.right;
+				if(child.priority > node.priority){
+					if(this.root == node)
+						this.root = child;
+					this.parentNodes.forEach(function(item, i, arr){
+						if(item == node)
+							arr[i] = child;
+						if(item == child)
+							arr[i] = node;
+					})
+					child.swapWithParent(node);
+					this.shiftNodeDown(node);
+				}
 			}
 		}
 	}
