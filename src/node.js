@@ -29,9 +29,7 @@ class Node {
 			this.right = null;
 			node.parent = null
 		}
-		else{
-			throw new Error();
-		}
+		else throw new Error();
 	}
 
 	remove() {
@@ -70,21 +68,17 @@ class Node {
 	            leftChild.parent = parent;
 	            parent.left = leftChild;
 	        }
-	        else{
-	            parent.left = null;
-	        }
+	        else parent.left = null;
+	        
 	        if(rightChild){
 	        	rightChild.parent = parent;
 	            parent.right = rightChild;
 	        }
-	        else{
-	            parent.right = null;
-	        }
+	        else parent.right = null;
 
 	        //обновляем с родителя родителя node
-	    	if(parentOfParent){
+	    	if(parentOfParent)
 	            parentOfParent.appendChild(node);
-	    	}
 		}
 	}
 }

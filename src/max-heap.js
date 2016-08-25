@@ -28,7 +28,7 @@ class MaxHeap {
 		if(this.root){
 			let root = this.root;
 			this.root = null;
-			if (this.parentNodes[0] == root)
+			if(this.parentNodes[0] == root)
 				this.parentNodes.shift();
 			return root;
 		}
@@ -36,13 +36,17 @@ class MaxHeap {
 
 	restoreRootFromLastInsertedNode(detached) {
 		let node = this.parentNodes.pop();
-		if(node){
-			this.root = node;
-			this.parentNodes.unshift(node);
+		this.root = node;
+		if(node && node.parent){
+			let nodeParent = node.parent;
+			node.remove();
 			if(detached.left)
 				node.appendChild(detached.left);
 			if(detached.right)
 				node.appendChild(detached.right);
+			if(nodeParent != detached && nodeParent.left)
+				this.parentNodes.unshift(nodeParent);
+			this.parentNodes.unshift(node);
 		}
 	}
 
@@ -51,7 +55,7 @@ class MaxHeap {
 	}
 
 	isEmpty() {
-		return (!this.root)
+		return !this.root
 	}
 
 	clear() {
@@ -63,9 +67,8 @@ class MaxHeap {
 	insertNode(node) {
 		this.root ? this.parentNodes[0].appendChild(node) : this.root = node;
 		this.parentNodes.push(node);
-		if(this.parentNodes[0].right){
+		if(this.parentNodes[0].right)
 			this.parentNodes.shift();
-		}
 	}
 
 	shiftNodeUp(node) {
@@ -90,7 +93,7 @@ class MaxHeap {
 				child = node.left;
 				if(child.priority > node.priority){
 					if(this.root == node)
-						this.root = child
+						this.root = child;
 					this.parentNodes.forEach(function(item, i, arr){
 						if(item == node)
 							arr[i] = child;
